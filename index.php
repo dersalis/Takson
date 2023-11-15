@@ -11,6 +11,9 @@
 
         return $tasks;
     }
+
+    $tasks = getAll($connection);
+    //$tasks = null;
 ?>
 <!doctype html>
 <html lang="en">
@@ -47,38 +50,80 @@
   </header>
   <main>
     <div class="container">
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Description</th>
-            <th scope="col">Priority</th>
-            <th scope="col">Author name</th>
-            <th scope="col">Assigned name</th>
-            <th scope="col">Start date</th>
-            <th scope="col">End date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php 
-                $tasks = getAll($connection);
-                while($task = mysqli_fetch_assoc($tasks)) {
-                    echo '
-                    <tr>
-                        <th scope="row">' . $task['Id'] . '</th>
-                        <td>' . $task['Name'] . '</td>
-                        <td>' . $task['Description'] . '</td>
-                        <td>' . $task['Priority'] . '</td>
-                        <td>' . $task['AuthorName'] . '</td>
-                        <td>' . $task['AssignedName'] . '</td>
-                        <td>' . $task['StartDate'] . '</td>
-                        <td>' . $task['EndDate'] . '</td>
-                    </tr>';
+        <?php
+            function tasksAlert() {
+                echo '
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Tasks</h4>
+                        <hr>
+                        <p>
+                            Tasks cannot be downloaded or no task has been added :(
+                        </p>
+                    </div>
+                ';
+            }
+
+            function connectionAlert() {
+                echo '
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Connection</h4>
+                        <hr>
+                        <p>
+                            There was a problem connecting to the database :(
+                        </p>
+                    </div>
+                ';
+            }
+
+            function createRow($id, $name, $description, $priority, $author, $assigned, $startdate, $enddate) {
+                echo '
+                        <tr>
+                            <th scope="row">' . $id . '</th>
+                            <td>' . $name . '</td>
+                            <td>' . $description . '</td>
+                            <td>' . $priority . '</td>
+                            <td>' . $author . '</td>
+                            <td>' . $assigned . '</td>
+                            <td>' . $startdate . '</td>
+                            <td>' . $enddate . '</td>
+                        </tr>';
+            }
+
+            if(!$tasks || !$connection) {
+                if(!$tasks) {
+                    tasksAlert();
                 }
-            ?>
-        </tbody>
-        </table>
+                if(!$connection) {
+                    connectionAlert();
+                }
+                
+            } else {
+                echo '
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Author name</th>
+                        <th scope="col">Assigned name</th>
+                        <th scope="col">Start date</th>
+                        <th scope="col">End date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                ';
+                while($task = mysqli_fetch_assoc($tasks)) {
+                    createRow($task['Id'], $task['Name'], $task['Description'], $task['Priority'], $task['AuthorName'], $task['AssignedName'], $task['StartDate'], $task['EndDate']);
+                }
+                echo '
+                    </tbody>
+                </table>
+                ';
+            }
+        ?>
+
     </div>
   </main>
   <footer>
